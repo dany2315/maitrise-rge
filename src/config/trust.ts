@@ -28,8 +28,8 @@ export const trustItems: TrustItem[] = [
     name: "Qualification RGE",
     description:
       "Qualification « Reconnu Garant de l'Environnement » pour les domaines de travaux couverts par le certificat en cours de validité.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
     verifyUrl: "https://france-renov.gouv.fr/annuaires-professionnels/artisan-rge-architectes",
   },
   {
@@ -38,8 +38,8 @@ export const trustItems: TrustItem[] = [
     name: "MaPrimeRénov'",
     description:
       "Aide publique de l'Anah. Nous vous aidons à vérifier si votre projet peut en bénéficier ; l'attribution relève de l'Anah.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
   },
   {
     id: "cee",
@@ -47,16 +47,16 @@ export const trustItems: TrustItem[] = [
     name: "Certificats d'économies d'énergie (CEE)",
     description:
       "Primes versées par des fournisseurs d'énergie. Les modalités dépendent du partenaire CEE retenu pour votre dossier.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
   },
   {
     id: "daikin",
     kind: "marque",
     name: "Daikin",
     description: "Marque de pompes à chaleur et de climatisation installée par nos équipes.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
     logo: { src: "/brands/daikin.svg", width: 300, height: 65 },
   },
   {
@@ -64,8 +64,8 @@ export const trustItems: TrustItem[] = [
     kind: "marque",
     name: "De Dietrich",
     description: "Marque d'équipements de chauffage installée par nos équipes.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
     logo: { src: "/brands/de-dietrich.png", width: 571, height: 120 },
   },
   {
@@ -73,8 +73,8 @@ export const trustItems: TrustItem[] = [
     kind: "marque",
     name: "Atlantic",
     description: "Marque d'équipements de chauffage et d'eau chaude installée par nos équipes.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
     logo: { src: "/brands/atlantic.svg", width: 210, height: 40 },
   },
   {
@@ -82,8 +82,8 @@ export const trustItems: TrustItem[] = [
     kind: "marque",
     name: "Chappée",
     description: "Marque d'équipements de chauffage installée par nos équipes.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
     logo: { src: "/brands/chappee.svg", width: 167, height: 38 },
   },
   {
@@ -91,8 +91,8 @@ export const trustItems: TrustItem[] = [
     kind: "marque",
     name: "Airwell",
     description: "Marque de pompes à chaleur et de climatisation installée par nos équipes.",
-    confirmed: false,
-    proof: null,
+    confirmed: true,
+    proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
     logo: { src: "/brands/airwell.svg", width: 157, height: 38 },
   },
 ];
