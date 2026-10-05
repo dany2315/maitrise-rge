@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+/*
+ * Identité Maîtrise RGE — couleurs issues du logo :
+ * vert (feuilles et maison), bleu (flocon), jaune/orange (soleil),
+ * bleu nuit (nom « Maîtrise »).
+ */
+@theme {
+  --color-ink: #13202b;
+  --color-ink-soft: #3a4955;
+  --color-muted: #5b6a74;
+  --color-line: #dfe5da;
+  --color-paper: #f6f8f2;
+  --color-paper-deep: #edf2e6;
+
+  --color-brand-50: #eff7ea;
+  --color-brand-100: #dcefd2;
+  --color-brand-200: #bde0aa;
+  --color-brand-300: #93ca76;
+  --color-brand-400: #6cb04a;
+  --color-brand-500: #4c9a2f;
+  --color-brand-600: #3b8126;
+  --color-brand-700: #2f6a22;
+  --color-brand-800: #24521d;
+  --color-brand-900: #183a16;
+  --color-brand-950: #0d2410;
+
+  --color-sky-50: #eef7fd;
+  --color-sky-100: #d6ecfa;
+  --color-sky-500: #2a93d5;
+  --color-sky-600: #1c79b8;
+  --color-sky-700: #175f91;
+
+  --color-sun-50: #fff8e6;
+  --color-sun-100: #feedbf;
+  --color-sun-300: #fbcf5c;
+  --color-sun-400: #f7b928;
+  --color-sun-600: #c47f06;
+  --color-sun-800: #7a4c05;
+
+  --color-danger: #b42318;
+  --color-danger-soft: #fdecea;
+
+  --font-sans: var(--font-body), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-display-face), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-soft: 0 1px 2px rgb(19 32 43 / 0.04), 0 8px 24px -12px rgb(19 32 43 / 0.12);
+  --shadow-lift: 0 2px 4px rgb(19 32 43 / 0.04), 0 24px 48px -24px rgb(19 32 43 / 0.25);
+
+  --animate-rise: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.12;
+    text-wrap: balance;
+    color: var(--color-ink);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-sky-500);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  /* Jamais moins de 16 px dans un champ : évite le zoom automatique sur mobile. */
+  input,
+  select,
+  textarea {
+    font-size: max(1rem, 16px);
+  }
+
+  ::selection {
+    background: var(--color-brand-200);
+    color: var(--color-ink);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Révélation douce au défilement (voir components/ui/reveal.tsx). */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.js .reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Texte long : articles et pages légales. */
+.prose-rge {
+  color: var(--color-ink-soft);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.prose-rge h2 {
+  margin-top: 2.75rem;
+  margin-bottom: 0.9rem;
+  font-size: clamp(1.4rem, 1.1rem + 1vw, 1.75rem);
+  font-weight: 650;
+}
+.prose-rge h3 {
+  margin-top: 1.75rem;
+  margin-bottom: 0.6rem;
+  font-size: 1.2rem;
+  font-weight: 650;
+}
+.prose-rge p {
+  margin-top: 1rem;
+}
+.prose-rge ul,
+.prose-rge ol {
+  margin-top: 1rem;
+  padding-left: 1.25rem;
+}
+.prose-rge ul {
+  list-style: disc;
+}
+.prose-rge ol {
+  list-style: decimal;
+}
+.prose-rge li {
+  margin-top: 0.45rem;
+  padding-left: 0.25rem;
+}
+.prose-rge li::marker {
+  color: var(--color-brand-500);
+}
+.prose-rge a {
+  color: var(--color-brand-700);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-rge a:hover {
+  color: var(--color-brand-900);
+}
+.prose-rge strong {
+  color: var(--color-ink);
+  font-weight: 650;
+}
