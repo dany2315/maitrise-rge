@@ -1,0 +1,76 @@
+import Image from "next/image";
+import { ContactForm } from "@/components/forms/contact-form";
+import { Container } from "@/components/ui/layout";
+import { site } from "@/config/site";
+import { photos } from "@/content/photos";
+
+export function Contact() {
+  const { phoneDisplay, phoneE164, email, openingHours } = site.contact;
+
+  return (
+    <section id="contact" aria-labelledby="contact-title" className="relative bg-paper py-20 sm:py-28">
+      <Container>
+        <div className="overflow-hidden rounded-[2.5rem] bg-white shadow-lift ring-1 ring-line lg:grid lg:grid-cols-12">
+          {/* Panneau d'introduction illustré */}
+          <div className="relative isolate flex flex-col justify-between gap-10 overflow-hidden bg-brand-800 p-8 text-white sm:p-12 lg:col-span-5">
+            <Image
+              src={photos.pacGarden.src}
+              alt=""
+              fill
+              sizes="(min-width: 1024px) 40vw, 100vw"
+              className="-z-20 object-cover opacity-30 mix-blend-luminosity"
+            />
+            <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-br from-brand-900/95 via-brand-800/85 to-brand-700/70" />
+
+            <div>
+              <p className="font-display text-sm font-semibold tracking-[0.18em] text-sun-300 uppercase">
+                Contact &amp; devis
+              </p>
+              <h2 id="contact-title" className="mt-4 text-4xl font-semibold text-white sm:text-5xl">
+                Parlons de votre projet.
+              </h2>
+              <p className="mt-5 max-w-sm text-lg text-brand-50/85">
+                Décrivez-nous votre logement et vos travaux. Nous revenons vers vous pour
+                approfondir et préparer une visite si nécessaire.
+              </p>
+            </div>
+
+            <dl className="grid gap-5 text-[0.98rem]">
+              <div>
+                <dt className="text-sm font-semibold tracking-wide text-brand-200 uppercase">Ce qui suit</dt>
+                <dd className="mt-1.5 text-brand-50/90">
+                  Un échange pour préciser vos besoins, puis une visite technique et un devis détaillé.
+                </dd>
+              </div>
+              {phoneDisplay && phoneE164 && (
+                <div>
+                  <dt className="text-sm font-semibold tracking-wide text-brand-200 uppercase">Téléphone</dt>
+                  <dd className="mt-1.5">
+                    <a href={`tel:${phoneE164}`} className="font-display text-2xl font-semibold text-white">
+                      {phoneDisplay}
+                    </a>
+                    {openingHours && <span className="block text-brand-100/75">{openingHours}</span>}
+                  </dd>
+                </div>
+              )}
+              {email && (
+                <div>
+                  <dt className="text-sm font-semibold tracking-wide text-brand-200 uppercase">Email</dt>
+                  <dd className="mt-1.5">
+                    <a href={`mailto:${email}`} className="font-semibold text-white underline underline-offset-4">
+                      {email}
+                    </a>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </div>
+
+          <div className="p-6 sm:p-12 lg:col-span-7">
+            <ContactForm />
+          </div>
+        </div>
+      </Container>
+    </section>
+  );
+}

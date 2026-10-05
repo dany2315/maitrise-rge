@@ -197,3 +197,6 @@
   color: var(--color-ink);
   font-weight: 650;
 }
+.prose-rge aside p:first-child {
+  margin-top: 0;
+}
