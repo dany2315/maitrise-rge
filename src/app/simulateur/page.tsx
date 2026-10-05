@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { Simulator } from "@/components/simulator/simulator";
 import { Container } from "@/components/ui/layout";
-import { isReviewMode } from "@/lib/env";
 import { getSimulatorMode } from "@/lib/simulator/mode";
 
 export const metadata: Metadata = {
@@ -36,7 +35,7 @@ export default function SimulatorPage() {
         </header>
 
         <Suspense fallback={<div className="h-[36rem] animate-pulse rounded-[2rem] bg-white/70 ring-1 ring-line" />}>
-          <Simulator mode={mode} reviewMode={isReviewMode()} />
+          <Simulator mode={mode} />
         </Suspense>
       </Container>
     </div>

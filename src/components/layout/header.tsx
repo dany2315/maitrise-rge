@@ -97,10 +97,10 @@ export function Header({ logo }: { logo: ReactNode }) {
               {phoneDisplay}
             </a>
           )}
-          <ButtonLink href={ctas.quote.href} variant="secondary" className="hidden lg:inline-flex">
+          <ButtonLink href={ctas.quote.href} variant="secondary" className="max-lg:hidden">
             {ctas.quote.label}
           </ButtonLink>
-          <ButtonLink href={ctas.simulator.href} className="hidden md:inline-flex" icon={<ArrowIcon />}>
+          <ButtonLink href={ctas.simulator.href} className="max-md:hidden" icon={<ArrowIcon />}>
             {ctas.simulator.label}
           </ButtonLink>
 

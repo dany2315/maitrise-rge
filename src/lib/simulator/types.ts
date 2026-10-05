@@ -1,28 +1,37 @@
-import type { Heating, Housing, IncomeCategory, Region, SimulatorWork } from "./options";
+import type { Heating, Housing, IncomeCategory, SimulatorWork } from "./options";
 
 export type SimulatorAnswers = {
   heating: Heating;
   housing: Housing;
   work: SimulatorWork;
-  region: Region;
-  householdSize: number;
+  /** Surface à isoler en m², pour les travaux chiffrés au m². */
+  surface?: number;
   income: IncomeCategory;
 };
 
 type ByIncome = Record<IncomeCategory, number>;
 
-export type WorkRule = {
-  /** Coût estimatif TTC des travaux, en euros. */
-  cost: number;
-  /** Forfait MaPrimeRénov' par catégorie de revenus (0 = non éligible). */
-  maPrimeRenov: ByIncome;
-  /** Prime CEE par catégorie de revenus. */
-  cee: ByIncome;
-  /** Types de logement pour lesquels le geste est proposé en ligne. */
-  housing: Housing[];
-  /** Bonus CEE (multiplicateur) selon l'énergie remplacée, ex. sortie du fioul. */
-  ceeHeatingFactor?: Partial<Record<Heating, number>>;
-};
+export type WorkRule =
+  | {
+      pricing: "forfait";
+      /** Coût estimatif TTC des travaux, en euros. */
+      cost: number;
+      /** Forfait MaPrimeRénov' par catégorie de revenus (0 = non éligible). */
+      maPrimeRenov: ByIncome;
+      /** Prime CEE par catégorie de revenus. */
+      cee: ByIncome;
+      /** Multiplicateur CEE selon l'énergie remplacée (ex. bonification sortie du fioul). */
+      ceeHeatingFactor?: Partial<Record<Heating, number>>;
+      housing: Housing[];
+    }
+  | {
+      pricing: "m2";
+      /** Coût estimatif TTC par m². */
+      costPerM2: number;
+      maPrimeRenovPerM2: ByIncome;
+      ceePerM2: ByIncome;
+      housing: Housing[];
+    };
 
 export type CommercialDiscount = {
   enabled: boolean;
@@ -63,8 +72,8 @@ export type SimulationResult = {
   maPrimeRenov: number;
   cee: number;
   publicAidTotal: number;
-  /** true si le plafond de cumul a réduit les aides. */
-  capped: boolean;
+  /** Montant retiré par le plafonnement du cumul des aides publiques. */
+  capReduction: number;
   discount: number;
   discountLabel: string | null;
   totalSupport: number;

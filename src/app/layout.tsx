@@ -61,7 +61,13 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fr" className={`${display.variable} ${body.variable}`} data-scroll-behavior="smooth">
+    // La classe « js » est ajoutée avant l'hydratation : écart attendu sur cette seule balise.
+    <html
+      lang="fr"
+      className={`${display.variable} ${body.variable}`}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         {/* Active les animations d'apparition seulement si JavaScript est disponible. */}
         <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />

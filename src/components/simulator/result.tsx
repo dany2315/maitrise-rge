@@ -117,10 +117,13 @@ export function Result({
               <SubRow label="Primes CEE" value={result.cee} />
               <SubRow label="Total des aides publiques" value={result.publicAidTotal} strong />
             </dl>
-            {result.capped && (
-              <p className="mt-3 text-sm text-muted">
-                Le plafond de cumul des aides publiques, fonction de vos revenus, a été appliqué.
-              </p>
+            {result.capReduction > 0 && (
+              <div className="mt-3 flex items-baseline justify-between gap-4 border-t border-line pt-3 text-[0.95rem]">
+                <span className="text-ink-soft">
+                  dont plafonnement du cumul des aides, selon vos revenus
+                </span>
+                <span className="tabular-nums font-medium text-ink-soft">−{formatEuros(result.capReduction)}</span>
+              </div>
             )}
           </div>
 

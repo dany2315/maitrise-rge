@@ -7,44 +7,45 @@ import { ArrowIcon, Button } from "@/components/ui/button";
 import { ReviewBadge } from "@/components/ui/layout";
 import { cn, formatEuros } from "@/lib/cn";
 import { calculateSimulation } from "@/lib/simulator/calculate";
-import { incomeBands, incomeCeilings } from "@/lib/simulator/income-ceilings";
+import { singlePersonCeiling } from "@/lib/simulator/income-ceilings";
 import {
+  electricFallbackWork,
   heatingOptions,
   housingOptions,
   incomeCategoryOptions,
+  isWorkBlocked,
   labelOf,
-  regionOptions,
   simulatorWorkOptions,
+  surfaceSettings,
   type Heating,
   type Housing,
   type IncomeCategory,
-  type Region,
   type SimulatorWork,
 } from "@/lib/simulator/options";
 import type { SimulatorAnswers, SimulatorMode } from "@/lib/simulator/types";
 import { ChoiceGroup } from "./choice-group";
 import { heatingIcons, housingIcons, workIcons } from "./icons";
+import { IncomeGridDialog } from "./income-grid-dialog";
 import { QuoteForm } from "./quote-form";
 import { Result, SimulationDisclaimer } from "./result";
 
 const STEPS = [
-  { key: "heating", label: "Chauffage", title: "Comment votre logement est-il chauffé aujourd'hui ?" },
-  { key: "housing", label: "Logement", title: "Dans quel type de logement vivez-vous ?" },
-  { key: "work", label: "Travaux", title: "Quels travaux envisagez-vous ?" },
-  { key: "income", label: "Revenus", title: "Quelle est la situation de votre foyer ?" },
-  { key: "result", label: "Résultat", title: "Votre estimation" },
+  { key: "heating", label: "Chauffage", title: "Votre énergie de chauffage", sub: "Qu'est-ce qui chauffe votre logement aujourd'hui ?" },
+  { key: "housing", label: "Logement", title: "Votre logement", sub: "Maison individuelle ou appartement ?" },
+  { key: "work", label: "Travaux", title: "Vos travaux", sub: "Quels travaux envisagez-vous ?" },
+  { key: "income", label: "Revenus", title: "Vos revenus", sub: "Pour estimer vos droits aux aides." },
+  { key: "result", label: "Estimation", title: "Vos aides estimées", sub: "Voici l'estimation correspondant à vos réponses." },
 ] as const;
 
 type Draft = {
   heating?: Heating;
   housing?: Housing;
   work?: SimulatorWork;
-  region?: Region;
-  householdSize: number;
+  surface?: number;
   income?: IncomeCategory;
 };
 
-const STORAGE_KEY = "maitrise-rge:simulateur";
+const STORAGE_KEY = "maitrise-rge:simulateur:v2";
 const isIn = <T extends string>(options: readonly { value: T }[], v: unknown): v is T =>
   typeof v === "string" && options.some((o) => o.value === v);
 
@@ -57,21 +58,30 @@ function readStored(): { draft: Draft; step: number } | null {
   }
 }
 
-export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMode: boolean }) {
+const incomeHint = (value: IncomeCategory) =>
+  value === "superieurs"
+    ? "Au-delà des plafonds intermédiaires"
+    : `Jusqu'à ${formatEuros(singlePersonCeiling(value))} pour 1 personne hors Île-de-France`;
+
+export function Simulator({ mode }: { mode: SimulatorMode }) {
   const params = useSearchParams();
   const [step, setStep] = useState(0);
-  const [draft, setDraft] = useState<Draft>({ householdSize: 2 });
+  const [draft, setDraft] = useState<Draft>({});
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [showForm, setShowForm] = useState(false);
   const [sent, setSent] = useState(false);
+  const [gridOpen, setGridOpen] = useState(false);
   const [hydrated, setHydrated] = useState(false);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const rootRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLDivElement>(null);
   const firstRender = useRef(true);
 
   // Restaure les réponses de la session, puis applique un éventuel pré-remplissage par lien.
   useEffect(() => {
     const stored = readStored();
-    const next: Draft = stored?.draft ?? { householdSize: 2 };
+    const next: Draft = stored?.draft ?? {};
     let nextStep = stored?.step ?? 0;
     const heating = params.get("chauffage");
     const work = params.get("travaux");
@@ -79,7 +89,11 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
       next.heating = heating;
       nextStep = Math.max(nextStep, 1);
     }
-    if (isIn(simulatorWorkOptions, work)) next.work = work;
+    if (isIn(simulatorWorkOptions, work)) {
+      next.work = work;
+      if (surfaceSettings[work]) next.surface = surfaceSettings[work]?.default;
+    }
+    if (next.work && isWorkBlocked(next.work, next.heating)) next.work = undefined;
     // eslint-disable-next-line react-hooks/set-state-in-effect -- lecture unique du stockage navigateur après hydratation
     setDraft(next);
     setStep(Math.min(nextStep, 3));
@@ -95,7 +109,7 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
     }
   }, [draft, step, hydrated]);
 
-  // Place le focus sur le titre de l'étape et ramène l'étape en vue.
+  // Place le focus sur le titre de l'étape et ramène le simulateur en vue.
   useEffect(() => {
     if (firstRender.current) {
       firstRender.current = false;
@@ -109,13 +123,12 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
   }, [step]);
 
   const answers: SimulatorAnswers | null =
-    draft.heating && draft.housing && draft.work && draft.region && draft.income
+    draft.heating && draft.housing && draft.work && draft.income
       ? {
           heating: draft.heating,
           housing: draft.housing,
           work: draft.work,
-          region: draft.region,
-          householdSize: draft.householdSize,
+          surface: surfaceSettings[draft.work] ? draft.surface : undefined,
           income: draft.income,
         }
       : null;
@@ -126,65 +139,97 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
     [draft, mode],
   );
 
+  const chooseHeating = (heating: Heating) => {
+    setError(null);
+    if (draft.work && isWorkBlocked(draft.work, heating)) {
+      setNotice(
+        `Avec un chauffage électrique, « ${labelOf(simulatorWorkOptions, draft.work)} » n'est pas proposé : votre choix de travaux a été remplacé par « ${labelOf(simulatorWorkOptions, electricFallbackWork)} ».`,
+      );
+      setDraft({ ...draft, heating, work: electricFallbackWork, surface: surfaceSettings[electricFallbackWork]?.default });
+      return;
+    }
+    setDraft({ ...draft, heating });
+  };
+
+  const chooseWork = (work: SimulatorWork) => {
+    setError(null);
+    setNotice(null);
+    setDraft((d) => ({ ...d, work, surface: surfaceSettings[work]?.default }));
+  };
+
   const set = <K extends keyof Draft>(key: K, value: Draft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
     setError(null);
   };
 
-  function stepError(): string | null {
-    switch (STEPS[step].key) {
-      case "heating":
-        return draft.heating ? null : "Sélectionnez votre mode de chauffage pour continuer.";
-      case "housing":
-        return draft.housing ? null : "Sélectionnez votre type de logement pour continuer.";
-      case "work":
-        return draft.work ? null : "Sélectionnez les travaux envisagés pour continuer.";
-      case "income":
-        if (!draft.region) return "Indiquez la région de votre logement.";
-        if (!draft.income) return "Sélectionnez la catégorie de revenus de votre foyer.";
-        return null;
-      default:
-        return null;
-    }
-  }
+  const current = STEPS[step];
+  const isResult = current.key === "result";
+  const answered =
+    (current.key === "heating" && Boolean(draft.heating)) ||
+    (current.key === "housing" && Boolean(draft.housing)) ||
+    (current.key === "work" && Boolean(draft.work)) ||
+    (current.key === "income" && Boolean(draft.income)) ||
+    isResult;
+
+  const missingMessage: Record<string, string> = {
+    heating: "Sélectionnez votre énergie de chauffage pour continuer.",
+    housing: "Sélectionnez votre type de logement pour continuer.",
+    work: "Sélectionnez les travaux envisagés pour continuer.",
+    income: "Sélectionnez la catégorie de revenus de votre foyer pour continuer.",
+  };
 
   const next = () => {
-    const problem = stepError();
-    if (problem) {
-      setError(problem);
+    if (!answered) {
+      setError(missingMessage[current.key]);
       return;
     }
     setError(null);
+    // Le message de bascule automatique reste visible jusqu'à la sortie de l'étape Travaux.
+    if (current.key === "work") setNotice(null);
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
   const back = () => {
     setError(null);
+    setShowForm(false);
     setStep((s) => Math.max(s - 1, 0));
   };
 
-  const restart = () => {
-    setDraft({ householdSize: 2 });
-    setSent(false);
+  const goTo = (target: number) => {
     setError(null);
+    setShowForm(false);
+    setStep(target);
+  };
+
+  const openForm = () => {
+    setShowForm(true);
+    requestAnimationFrame(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      formRef.current?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true });
+    });
+  };
+
+  const restart = () => {
+    setDraft({});
+    setSent(false);
+    setShowForm(false);
+    setError(null);
+    setNotice(null);
     setStep(0);
   };
 
-  const current = STEPS[step];
-  const isResult = current.key === "result";
-  const bands = draft.region ? incomeBands(draft.region, draft.householdSize) : null;
-
+  const surface = draft.work ? surfaceSettings[draft.work] : undefined;
   const recap = [
-    { step: 0, label: "Chauffage", value: labelOf(heatingOptions, draft.heating) },
+    { step: 0, label: "Chauffage actuel", value: labelOf(heatingOptions, draft.heating) },
     { step: 1, label: "Logement", value: labelOf(housingOptions, draft.housing) },
-    { step: 2, label: "Travaux", value: labelOf(simulatorWorkOptions, draft.work) },
     {
-      step: 3,
-      label: "Foyer",
-      value: draft.income
-        ? `${labelOf(incomeCategoryOptions, draft.income)} · ${draft.householdSize} pers. · ${labelOf(regionOptions, draft.region)}`
+      step: 2,
+      label: "Travaux",
+      value: draft.work
+        ? `${labelOf(simulatorWorkOptions, draft.work)}${surface && draft.surface ? ` · ${draft.surface} m²` : ""}`
         : "",
     },
+    { step: 3, label: "Revenus", value: draft.income ? `Foyer ${labelOf(incomeCategoryOptions, draft.income).toLowerCase()}` : "" },
   ];
 
   return (
@@ -195,7 +240,7 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
           <div className="border-b border-line px-5 pt-6 pb-5 sm:px-8">
             <div className="flex items-center justify-between gap-4">
               <p className="text-sm font-semibold text-brand-700">
-                Étape {step + 1} sur {STEPS.length}
+                Étape {step + 1} / {STEPS.length}
                 <span className="text-muted"> · {current.label}</span>
               </p>
               {mode.kind === "demo" && <ReviewBadge>Barèmes d&apos;exemple</ReviewBadge>}
@@ -207,21 +252,16 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
               aria-valuemax={STEPS.length}
               aria-valuenow={step + 1}
               aria-valuetext={`Étape ${step + 1} sur ${STEPS.length} : ${current.label}`}
-              className="mt-4 grid grid-cols-5 gap-1.5"
+              className="mt-4 h-2 overflow-hidden rounded-full bg-paper-deep"
             >
-              {STEPS.map((s, i) => (
-                <span
-                  key={s.key}
-                  className={cn(
-                    "h-1.5 rounded-full transition-colors duration-500",
-                    i < step ? "bg-brand-600" : i === step ? "bg-brand-400" : "bg-paper-deep",
-                  )}
-                />
-              ))}
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-brand-500 to-brand-700 transition-[width] duration-500 ease-out"
+                style={{ width: `${((step + 1) / STEPS.length) * 100}%` }}
+              />
             </div>
             <ol aria-hidden="true" className="mt-2.5 hidden grid-cols-5 gap-1.5 text-xs font-medium text-muted sm:grid">
               {STEPS.map((s, i) => (
-                <li key={s.key} className={cn(i === step && "text-ink")}>
+                <li key={s.key} className={cn(i <= step && "text-ink")}>
                   {s.label}
                 </li>
               ))}
@@ -232,15 +272,16 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
             <h2 ref={titleRef} tabIndex={-1} className="text-[1.65rem] leading-tight font-semibold outline-none sm:text-3xl">
               {current.title}
             </h2>
+            <p className="mt-2 text-lg text-ink-soft">{current.sub}</p>
 
             <div className="mt-7">
               {current.key === "heating" && (
                 <ChoiceGroup
                   name="heating"
-                  legend={current.title}
+                  legend={current.sub}
                   options={heatingOptions}
                   value={draft.heating}
-                  onChange={(v) => set("heating", v)}
+                  onChange={chooseHeating}
                   error={error ?? undefined}
                   icons={heatingIcons}
                 />
@@ -249,7 +290,7 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
               {current.key === "housing" && (
                 <ChoiceGroup
                   name="housing"
-                  legend={current.title}
+                  legend={current.sub}
                   options={housingOptions}
                   value={draft.housing}
                   onChange={(v) => set("housing", v)}
@@ -259,171 +300,151 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
               )}
 
               {current.key === "work" && (
-                <ChoiceGroup
-                  name="work"
-                  legend={current.title}
-                  options={simulatorWorkOptions}
-                  value={draft.work}
-                  onChange={(v) => set("work", v)}
-                  error={error ?? undefined}
-                  icons={workIcons}
-                />
+                <div className="space-y-8">
+                  {notice && (
+                    <p role="status" className="rounded-2xl bg-sky-50 px-5 py-4 text-[0.95rem] text-sky-700 ring-1 ring-sky-100">
+                      {notice}
+                    </p>
+                  )}
+                  <ChoiceGroup
+                    name="work"
+                    legend={current.sub}
+                    options={simulatorWorkOptions}
+                    value={draft.work}
+                    onChange={chooseWork}
+                    error={error ?? undefined}
+                    icons={workIcons}
+                    isDisabled={(v) => isWorkBlocked(v, draft.heating)}
+                    disabledNote="Non proposé avec un chauffage électrique"
+                  />
+
+                  {draft.work && surface && (
+                    <div className="rounded-2xl bg-paper p-5 ring-1 ring-line sm:p-6">
+                      <div className="flex items-baseline justify-between gap-4">
+                        <label htmlFor="surface" className="text-lg font-semibold">
+                          Surface à isoler
+                        </label>
+                        <output htmlFor="surface" className="font-display text-2xl font-semibold text-brand-800 tabular-nums">
+                          {draft.surface ?? surface.default} m²
+                        </output>
+                      </div>
+                      <input
+                        id="surface"
+                        type="range"
+                        min={surface.min}
+                        max={surface.max}
+                        step={surface.step}
+                        value={draft.surface ?? surface.default}
+                        onChange={(e) => set("surface", Number(e.target.value))}
+                        aria-valuetext={`${draft.surface ?? surface.default} mètres carrés`}
+                        className="mt-5 h-11 w-full cursor-pointer accent-brand-700"
+                      />
+                      <div aria-hidden="true" className="flex justify-between text-sm text-muted">
+                        <span>{surface.min} m²</span>
+                        <span>{surface.max} m²</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               )}
 
               {current.key === "income" && (
-                <div className="space-y-9">
-                  <div>
-                    <p id="region-label" className="text-lg font-semibold">
-                      Où se situe le logement ?
-                    </p>
-                    <div role="radiogroup" aria-labelledby="region-label" className="mt-3 grid grid-cols-2 gap-3">
-                      {regionOptions.map((o) => (
-                        <label
-                          key={o.value}
-                          className={cn(
-                            "flex min-h-14 cursor-pointer items-center justify-center rounded-2xl px-4 text-center font-semibold ring-1 transition has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-sky-500/40",
-                            draft.region === o.value
-                              ? "bg-brand-700 text-white ring-brand-700"
-                              : "bg-white text-ink ring-line hover:ring-brand-300",
-                          )}
-                        >
-                          <input
-                            type="radio"
-                            name="region"
-                            value={o.value}
-                            checked={draft.region === o.value}
-                            onChange={() => set("region", o.value)}
-                            className="sr-only"
-                          />
-                          {o.label}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <p id="people-label" className="text-lg font-semibold">
-                      Combien de personnes composent votre foyer fiscal ?
-                    </p>
-                    <div className="mt-3 inline-flex items-center gap-2 rounded-2xl bg-paper p-1.5 ring-1 ring-line">
-                      <button
-                        type="button"
-                        aria-label="Retirer une personne"
-                        disabled={draft.householdSize <= 1}
-                        onClick={() => set("householdSize", Math.max(1, draft.householdSize - 1))}
-                        className="flex size-12 items-center justify-center rounded-xl bg-white text-2xl font-semibold text-ink shadow-soft transition hover:bg-brand-50 disabled:opacity-40"
-                      >
-                        −
-                      </button>
-                      <output aria-labelledby="people-label" aria-live="polite" className="min-w-24 text-center font-display text-xl font-semibold">
-                        {draft.householdSize} {draft.householdSize > 1 ? "personnes" : "personne"}
-                      </output>
-                      <button
-                        type="button"
-                        aria-label="Ajouter une personne"
-                        disabled={draft.householdSize >= 12}
-                        onClick={() => set("householdSize", Math.min(12, draft.householdSize + 1))}
-                        className="flex size-12 items-center justify-center rounded-xl bg-white text-2xl font-semibold text-ink shadow-soft transition hover:bg-brand-50 disabled:opacity-40"
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
-
-                  <div>
-                    <p className="text-lg font-semibold">Revenu fiscal de référence du foyer</p>
-                    <p className="mt-1 text-[0.95rem] text-muted">
-                      Il figure sur votre dernier avis d&apos;imposition.{" "}
-                      {!draft.region && "Choisissez d'abord la région pour afficher les plafonds."}
-                    </p>
-                    <div className="mt-4">
-                      <ChoiceGroup
-                        name="income"
-                        legend="Catégorie de revenus"
-                        options={incomeCategoryOptions}
-                        value={draft.income}
-                        onChange={(v) => set("income", v)}
-                        error={draft.region ? (error ?? undefined) : undefined}
-                        describe={
-                          bands
-                            ? (v) => {
-                                const b = bands[v] as { min?: number; max?: number };
-                                if (b.max && !b.min) return `Jusqu'à ${formatEuros(b.max)}`;
-                                if (b.min && b.max) return `De ${formatEuros(b.min)} à ${formatEuros(b.max)}`;
-                                return `Au-delà de ${formatEuros(b.min ?? 0)}`;
-                              }
-                            : undefined
-                        }
-                      />
-                    </div>
-                    {!draft.region && error && (
-                      <p role="alert" className="mt-4 text-[0.95rem] font-medium text-danger">
-                        {error}
-                      </p>
-                    )}
-                    <p className="mt-4 flex flex-wrap items-center gap-2 text-sm text-muted">
-                      Plafonds {incomeCeilings.millesime} publiés par l&apos;Anah, donnés à titre indicatif.
-                      {!incomeCeilings.verified && reviewMode && <ReviewBadge>Grille à vérifier</ReviewBadge>}
-                    </p>
-                  </div>
+                <div>
+                  <ChoiceGroup
+                    name="income"
+                    legend="Revenus du foyer"
+                    options={incomeCategoryOptions.map((o) => ({ ...o, hint: incomeHint(o.value) }))}
+                    value={draft.income}
+                    onChange={(v) => set("income", v)}
+                    error={error ?? undefined}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setGridOpen(true)}
+                    className="mt-5 inline-flex min-h-11 items-center gap-2 rounded-full font-semibold text-brand-800 underline-offset-4 hover:underline"
+                  >
+                    Voir la grille de revenus complète
+                    <ArrowIcon />
+                  </button>
+                  <p className="mt-1 text-sm text-muted">
+                    Votre catégorie dépend du revenu fiscal de référence, du nombre de personnes du foyer
+                    et de la région.
+                  </p>
+                  <IncomeGridDialog open={gridOpen} onClose={() => setGridOpen(false)} />
                 </div>
               )}
 
               {isResult && answers && (
-                <div className="space-y-10">
-                  <Result mode={mode} result={result} workLabel={labelOf(simulatorWorkOptions, answers.work)} />
+                <div className="space-y-8">
+                  <Result mode={mode} result={result} workLabel={recap[2].value} />
                   <SimulationDisclaimer />
 
-                  <div id="demande-devis" className="scroll-mt-28 border-t border-line pt-9">
-                    {sent ? (
-                      <div role="status" className="rounded-[1.75rem] bg-brand-50 p-7 ring-1 ring-brand-200 sm:p-9">
-                        <h3 className="text-2xl font-semibold">Votre demande de devis est enregistrée.</h3>
-                        <p className="mt-3 text-ink-soft">
-                          Merci. Vos coordonnées et vos réponses au simulateur ont bien été transmises à
-                          notre équipe, qui reviendra vers vous pour étudier votre projet.
-                        </p>
-                        <Button variant="secondary" className="mt-6" onClick={restart}>
-                          Faire une nouvelle simulation
-                        </Button>
-                      </div>
-                    ) : (
-                      <>
-                        <h3 className="text-2xl font-semibold sm:text-[1.75rem]">Recevoir un devis personnalisé</h3>
-                        <p className="mt-2 mb-7 text-ink-soft">
-                          Votre logement et vos travaux sont repris ci-dessous ; vous pouvez les ajuster.
-                        </p>
-                        <QuoteForm answers={answers} onSuccess={() => setSent(true)} />
-                      </>
-                    )}
-                  </div>
+                  {(showForm || sent) && (
+                    <div ref={formRef} id="demande-devis" className="scroll-mt-28 border-t border-line pt-9">
+                      {sent ? (
+                        <div role="status" className="rounded-[1.75rem] bg-brand-50 p-7 ring-1 ring-brand-200 sm:p-9">
+                          <h3 className="text-2xl font-semibold">Votre demande de devis est enregistrée.</h3>
+                          <p className="mt-3 text-ink-soft">
+                            Merci. Vos coordonnées et votre simulation ont bien été transmises à notre
+                            équipe, qui reviendra vers vous pour étudier votre projet.
+                          </p>
+                          <Button variant="secondary" className="mt-6" onClick={restart}>
+                            Faire une nouvelle simulation
+                          </Button>
+                        </div>
+                      ) : (
+                        <>
+                          <h3 className="text-2xl font-semibold sm:text-[1.75rem]">Obtenir mon devis</h3>
+                          <div className="mt-5 mb-7 rounded-2xl bg-paper p-5 ring-1 ring-line">
+                            <p className="text-sm font-semibold tracking-wide text-brand-700 uppercase">Votre simulation</p>
+                            <dl className="mt-3 grid gap-x-6 gap-y-2 text-[0.95rem] sm:grid-cols-2">
+                              {recap.map((r) => (
+                                <div key={r.label} className="flex justify-between gap-3 sm:block">
+                                  <dt className="text-muted">{r.label}</dt>
+                                  <dd className="text-right font-semibold sm:text-left">{r.value}</dd>
+                                </div>
+                              ))}
+                            </dl>
+                          </div>
+                          <QuoteForm answers={answers} onSuccess={() => setSent(true)} />
+                        </>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
             </div>
           </div>
 
           {/* Navigation entre étapes, collée en bas de l'écran sur mobile */}
-          <div className="sticky bottom-0 z-10 flex items-center justify-between gap-3 rounded-b-[2rem] border-t border-line bg-white/95 px-5 py-4 backdrop-blur sm:static sm:px-8 sm:py-5">
-            {step > 0 ? (
-              <Button variant="ghost" onClick={back} className="-ml-2 px-3">
+          {!sent && (
+            <div className="sticky bottom-0 z-10 flex items-center justify-between gap-3 rounded-b-[2rem] border-t border-line bg-white/95 px-5 py-4 backdrop-blur sm:static sm:px-8 sm:py-5">
+              <Button variant="ghost" onClick={back} disabled={step === 0} className="-ml-2 px-3">
                 <svg aria-hidden="true" viewBox="0 0 20 20" className="size-4.5 rotate-180" fill="none">
                   <path d="M4 10h11m0 0-4.5-4.5M15 10l-4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                {isResult ? "Modifier mes réponses" : "Précédent"}
+                Précédent
               </Button>
-            ) : (
-              <span />
-            )}
-            {isResult ? (
-              <Button variant="secondary" onClick={restart}>
-                Recommencer
-              </Button>
-            ) : (
-              <Button onClick={next} size="lg" className="min-w-36">
-                {step === STEPS.length - 2 ? "Voir l'estimation" : "Suivant"}
-                <ArrowIcon />
-              </Button>
-            )}
-          </div>
+              {isResult ? (
+                !showForm && (
+                  <Button onClick={openForm} size="lg">
+                    Obtenir mon devis
+                    <ArrowIcon />
+                  </Button>
+                )
+              ) : (
+                <Button
+                  onClick={next}
+                  size="lg"
+                  aria-disabled={!answered}
+                  className={cn("min-w-36", !answered && "opacity-50")}
+                >
+                  {step === STEPS.length - 2 ? "Voir mes aides" : "Suivant"}
+                  <ArrowIcon />
+                </Button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -441,16 +462,13 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
                       {r.value || "—"}
                     </dd>
                   </div>
-                  {r.value && r.step < step && (
+                  {r.value && r.step < step && !sent && (
                     <button
                       type="button"
-                      onClick={() => {
-                        setError(null);
-                        setStep(r.step);
-                      }}
+                      onClick={() => goTo(r.step)}
                       className="shrink-0 rounded-lg px-2 py-1 text-sm font-semibold text-brand-800 underline-offset-2 hover:underline"
                     >
-                      Modifier<span className="sr-only"> {r.label.toLowerCase()}</span>
+                      Modifier<span className="sr-only"> : {r.label.toLowerCase()}</span>
                     </button>
                   )}
                 </div>
@@ -468,7 +486,7 @@ export function Simulator({ mode, reviewMode }: { mode: SimulatorMode; reviewMod
                 <a href="https://france-renov.gouv.fr" target="_blank" rel="noopener" className="font-semibold text-sky-700 underline underline-offset-2">
                   France Rénov&apos;
                 </a>
-                .
+                , 0 808 800 700 (service gratuit + prix d&apos;un appel).
               </li>
             </ul>
             <Link href="/conseils/aides-maprimerenov-cee" className="mt-4 inline-flex min-h-11 items-center gap-2 font-semibold text-brand-800">

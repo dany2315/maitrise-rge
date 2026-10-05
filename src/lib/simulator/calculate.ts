@@ -1,3 +1,4 @@
+import { surfaceSettings } from "./options";
 import type { SimulationResult, SimulatorAnswers, SimulatorRules } from "./types";
 
 const round = (n: number) => Math.round(n);
@@ -8,7 +9,7 @@ const round = (n: number) => Math.round(n);
  * serveur pour recalculer le résultat enregistré dans Google Sheets.
  *
  * Ordre appliqué :
- *  1. aides publiques (MaPrimeRénov' + CEE) selon revenus et énergie remplacée ;
+ *  1. coût et aides publiques (MaPrimeRénov' + CEE), au forfait ou au m² ;
  *  2. plafond de cumul des aides publiques (en part du coût), MaPrimeRénov'
  *     réduite en premier ;
  *  3. remise commerciale, distincte des aides, limitée au reste à charge.
@@ -18,10 +19,7 @@ export function calculateSimulation(
   rules: SimulatorRules,
 ): SimulationResult {
   const rule = rules.works[answers.work];
-  const base = {
-    rulesStatus: rules.status,
-    rulesVersion: rules.version,
-  };
+  const base = { rulesStatus: rules.status, rulesVersion: rules.version };
 
   if (!rule.housing.includes(answers.housing)) {
     return {
@@ -33,7 +31,7 @@ export function calculateSimulation(
       maPrimeRenov: 0,
       cee: 0,
       publicAidTotal: 0,
-      capped: false,
+      capReduction: 0,
       discount: 0,
       discountLabel: null,
       totalSupport: 0,
@@ -42,14 +40,27 @@ export function calculateSimulation(
     };
   }
 
-  const cost = rule.cost;
-  let maPrimeRenov = rule.maPrimeRenov[answers.income];
-  let cee = rule.cee[answers.income] * (rule.ceeHeatingFactor?.[answers.heating] ?? 1);
+  let cost: number;
+  let maPrimeRenov: number;
+  let cee: number;
+  if (rule.pricing === "m2") {
+    const settings = surfaceSettings[answers.work];
+    const surface = Math.min(
+      settings?.max ?? Infinity,
+      Math.max(settings?.min ?? 1, answers.surface ?? settings?.default ?? 1),
+    );
+    cost = rule.costPerM2 * surface;
+    maPrimeRenov = rule.maPrimeRenovPerM2[answers.income] * surface;
+    cee = rule.ceePerM2[answers.income] * surface;
+  } else {
+    cost = rule.cost;
+    maPrimeRenov = rule.maPrimeRenov[answers.income];
+    cee = rule.cee[answers.income] * (rule.ceeHeatingFactor?.[answers.heating] ?? 1);
+  }
 
+  const beforeCap = maPrimeRenov + cee;
   const cap = cost * rules.publicAidCap[answers.income];
-  let capped = false;
-  if (maPrimeRenov + cee > cap) {
-    capped = true;
+  if (beforeCap > cap) {
     maPrimeRenov = Math.max(0, cap - cee);
     cee = Math.min(cee, cap);
   }
@@ -57,6 +68,7 @@ export function calculateSimulation(
   maPrimeRenov = round(maPrimeRenov);
   cee = round(cee);
   const publicAidTotal = maPrimeRenov + cee;
+  const capReduction = Math.max(0, round(beforeCap) - publicAidTotal);
   const beforeDiscount = Math.max(0, cost - publicAidTotal);
 
   const { discount: d } = rules;
@@ -68,16 +80,16 @@ export function calculateSimulation(
   }
 
   const totalSupport = publicAidTotal + discount;
-  const remaining = Math.max(0, cost - totalSupport);
+  const remaining = Math.max(0, round(cost) - totalSupport);
 
   return {
     ...base,
     eligible: true,
-    cost,
+    cost: round(cost),
     maPrimeRenov,
     cee,
     publicAidTotal,
-    capped,
+    capReduction,
     discount,
     discountLabel: discount > 0 ? d.label : null,
     totalSupport,

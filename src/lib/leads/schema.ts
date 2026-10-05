@@ -3,8 +3,8 @@ import {
   heatingOptions,
   housingOptions,
   incomeCategoryOptions,
+  isWorkBlocked,
   quoteWorkOptions,
-  regionOptions,
   simulatorWorkOptions,
   values,
 } from "@/lib/simulator/options";
@@ -49,14 +49,18 @@ const antiSpam = {
   startedAt: z.number().int().positive(),
 };
 
-export const simulationAnswersSchema = z.object({
-  heating: z.enum(values(heatingOptions)),
-  housing: z.enum(values(housingOptions)),
-  work: z.enum(values(simulatorWorkOptions)),
-  region: z.enum(values(regionOptions)),
-  householdSize: z.number().int().min(1).max(12),
-  income: z.enum(values(incomeCategoryOptions)),
-});
+export const simulationAnswersSchema = z
+  .object({
+    heating: z.enum(values(heatingOptions)),
+    housing: z.enum(values(housingOptions)),
+    work: z.enum(values(simulatorWorkOptions)),
+    surface: z.number().int().min(10).max(1000).optional(),
+    income: z.enum(values(incomeCategoryOptions)),
+  })
+  .refine((a) => !isWorkBlocked(a.work, a.heating), {
+    message: "Ces travaux ne sont pas proposés pour un logement chauffé à l'électricité.",
+    path: ["work"],
+  });
 
 export const quoteLeadSchema = z.object({
   source: z.literal("simulateur"),

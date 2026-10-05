@@ -18,6 +18,8 @@ export function ChoiceGroup<T extends string>({
   columns = 2,
   icons,
   describe,
+  isDisabled,
+  disabledNote,
 }: {
   name: string;
   legend: string;
@@ -28,6 +30,8 @@ export function ChoiceGroup<T extends string>({
   columns?: 2 | 3;
   icons?: Partial<Record<T, ReactNode>>;
   describe?: (value: T) => ReactNode;
+  isDisabled?: (value: T) => boolean;
+  disabledNote?: string;
 }) {
   return (
     <fieldset aria-describedby={error ? `${name}-error` : undefined} aria-invalid={error ? true : undefined}>
@@ -35,15 +39,18 @@ export function ChoiceGroup<T extends string>({
       <div className={cn("grid gap-3", columns === 3 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-2")}>
         {options.map((o) => {
           const checked = value === o.value;
+          const disabled = isDisabled?.(o.value) ?? false;
           return (
             <label
               key={o.value}
               className={cn(
-                "group relative flex min-h-20 cursor-pointer items-center gap-4 rounded-2xl bg-white p-4 ring-1 transition duration-200 sm:p-5",
+                "group relative flex min-h-20 items-center gap-4 rounded-2xl p-4 ring-1 transition duration-200 sm:p-5",
                 "has-[:focus-visible]:ring-4 has-[:focus-visible]:ring-sky-500/40",
-                checked
-                  ? "bg-brand-50 ring-2 ring-brand-600 shadow-[0_10px_30px_-18px_rgb(47_106_34/0.6)]"
-                  : "ring-line hover:ring-brand-300 hover:shadow-soft",
+                disabled
+                  ? "cursor-not-allowed bg-paper/70 opacity-60 ring-line"
+                  : checked
+                    ? "cursor-pointer bg-brand-50 ring-2 ring-brand-600 shadow-[0_10px_30px_-18px_rgb(47_106_34/0.6)]"
+                    : "cursor-pointer bg-white ring-line hover:ring-brand-300 hover:shadow-soft",
                 error && !checked && "ring-danger/60",
               )}
             >
@@ -52,6 +59,7 @@ export function ChoiceGroup<T extends string>({
                 name={name}
                 value={o.value}
                 checked={checked}
+                disabled={disabled}
                 onChange={() => onChange(o.value)}
                 className="peer sr-only"
               />
@@ -68,7 +76,11 @@ export function ChoiceGroup<T extends string>({
               )}
               <span className="min-w-0 flex-1">
                 <span className="block text-[1.05rem] leading-snug font-semibold text-ink">{o.label}</span>
-                {o.hint && <span className="mt-0.5 block text-sm leading-snug text-muted">{o.hint}</span>}
+                {disabled && disabledNote ? (
+                  <span className="mt-0.5 block text-sm leading-snug text-muted">{disabledNote}</span>
+                ) : (
+                  o.hint && <span className="mt-0.5 block text-sm leading-snug text-muted">{o.hint}</span>
+                )}
                 {describe && <span className="mt-1 block text-sm text-ink-soft">{describe(o.value)}</span>}
               </span>
               <span

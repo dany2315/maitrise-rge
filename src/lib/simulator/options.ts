@@ -1,6 +1,6 @@
 /**
- * Libellés et valeurs des réponses du simulateur. Partagé par l'interface,
- * la validation serveur et l'export Google Sheets.
+ * Libellés, valeurs et règles d'interaction du simulateur. Partagé par
+ * l'interface, la validation serveur et l'export Google Sheets.
  */
 
 export const heatingOptions = [
@@ -38,8 +38,8 @@ export const simulatorWorkOptions = [
   },
   {
     value: "isolation_exterieure",
-    label: "Isolation thermique extérieure",
-    hint: "Isolation des murs par l'extérieur (ITE)",
+    label: "Isolation des murs par l'extérieur (ITE)",
+    hint: "Isolant et finition posés sur les façades",
   },
   {
     value: "ssc",
@@ -64,8 +64,8 @@ export const incomeCategoryOptions = [
 ] as const;
 
 export const regionOptions = [
+  { value: "hors_idf", label: "Hors Île-de-France" },
   { value: "idf", label: "Île-de-France" },
-  { value: "hors_idf", label: "Autre région" },
 ] as const;
 
 export type Heating = (typeof heatingOptions)[number]["value"];
@@ -74,6 +74,23 @@ export type SimulatorWork = (typeof simulatorWorkOptions)[number]["value"];
 export type QuoteWork = (typeof quoteWorkOptions)[number]["value"];
 export type IncomeCategory = (typeof incomeCategoryOptions)[number]["value"];
 export type Region = (typeof regionOptions)[number]["value"];
+
+/**
+ * Travaux non proposés lorsque le logement est déjà chauffé à l'électricité.
+ * Si l'un d'eux est sélectionné puis que l'électricité est choisie, la
+ * sélection bascule sur `electricFallbackWork`.
+ */
+export const worksBlockedByElectricHeating: readonly SimulatorWork[] = ["pac_air_eau", "pac_ballon", "ssc"];
+export const electricFallbackWork: SimulatorWork = "isolation_combles";
+
+export const isWorkBlocked = (work: SimulatorWork, heating: Heating | undefined) =>
+  heating === "electricite" && worksBlockedByElectricHeating.includes(work);
+
+/** Travaux chiffrés à la surface : curseur affiché sous les choix de travaux. */
+export const surfaceSettings: Partial<Record<SimulatorWork, { min: number; max: number; default: number; step: number }>> = {
+  isolation_combles: { min: 30, max: 250, default: 80, step: 5 },
+  isolation_exterieure: { min: 60, max: 300, default: 100, step: 5 },
+};
 
 export const values = <T extends readonly { value: string }[]>(options: T) =>
   options.map((o) => o.value) as unknown as [T[number]["value"], ...T[number]["value"][]];
