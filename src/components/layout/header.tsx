@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowIcon, ButtonLink } from "@/components/ui/button";
 import { ctas, primaryNav, site } from "@/config/site";
+import { services } from "@/content/services";
 import { cn } from "@/lib/cn";
 
 export function Header({ logo }: { logo: ReactNode }) {
@@ -57,6 +58,7 @@ export function Header({ logo }: { logo: ReactNode }) {
   const isActive = (href: string) => !href.includes("#") && pathname.startsWith(href);
 
   return (
+    <>
     <header
       className={cn(
         "sticky top-0 z-40 transition-[background-color,box-shadow,backdrop-filter] duration-300",
@@ -137,12 +139,15 @@ export function Header({ logo }: { logo: ReactNode }) {
         </div>
       </div>
 
-      {/* Panneau mobile et tablette */}
+    </header>
+
+      {/* Panneau mobile et tablette : hors de l'en-tête, dont le flou d'arrière-plan
+          créerait un bloc conteneur pour les éléments fixes. */}
       <div
         id="menu-mobile"
         ref={panelRef}
         hidden={!open}
-        className="fixed inset-x-0 top-18 bottom-0 overflow-y-auto bg-white sm:top-20 xl:hidden"
+        className="fixed inset-x-0 top-18 bottom-0 z-40 overflow-y-auto overscroll-contain bg-white sm:top-20 xl:hidden"
       >
         <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 pt-6 pb-8 sm:px-6">
           <nav aria-label="Navigation mobile">
@@ -163,6 +168,23 @@ export function Header({ logo }: { logo: ReactNode }) {
             </ul>
           </nav>
 
+          <div className="mt-7">
+            <p className="text-sm font-semibold tracking-[0.14em] text-muted uppercase">Nos prestations</p>
+            <ul className="mt-3 grid grid-cols-2 gap-2">
+              {services.map((s) => (
+                <li key={s.id}>
+                  <Link
+                    href={`/prestations/${s.id}`}
+                    onClick={() => setOpen(false)}
+                    className="flex min-h-14 items-center rounded-2xl bg-paper px-3.5 py-2.5 text-[0.95rem] leading-snug font-semibold text-ink ring-1 ring-line transition active:bg-brand-50"
+                  >
+                    {s.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <div className="mt-auto grid gap-3 pt-8">
             <ButtonLink href={ctas.simulator.href} size="lg" onClick={() => setOpen(false)} icon={<ArrowIcon />}>
               {ctas.simulator.label}
@@ -182,7 +204,7 @@ export function Header({ logo }: { logo: ReactNode }) {
           </div>
         </div>
       </div>
-    </header>
+    </>
   );
 }
 

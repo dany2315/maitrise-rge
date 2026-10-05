@@ -48,6 +48,29 @@
   --shadow-lift: 0 2px 4px rgb(19 32 43 / 0.04), 0 24px 48px -24px rgb(19 32 43 / 0.25);
 
   --animate-rise: rise 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-marquee: marquee 38s linear infinite;
+  --animate-dock-in: dock-in 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      /* La piste contient deux copies identiques séparées par le même espace. */
+      transform: translateX(calc(-50% - 1.5rem));
+    }
+  }
+
+  @keyframes dock-in {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
 
   @keyframes rise {
     from {

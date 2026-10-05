@@ -27,8 +27,8 @@ export const site = {
 } as const;
 
 export const primaryNav = [
-  { href: "/#prestations", label: "Prestations" },
-  { href: "/#accompagnement", label: "Accompagnement" },
+  { href: "/prestations", label: "Prestations" },
+  { href: "/#qui-sommes-nous", label: "Qui sommes-nous" },
   { href: "/simulateur", label: "Simulateur" },
   { href: "/conseils", label: "Conseils" },
   { href: "/#faq", label: "FAQ" },

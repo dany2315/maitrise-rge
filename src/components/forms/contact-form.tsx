@@ -19,8 +19,8 @@ const initial = {
   message: "",
 };
 
-export function ContactForm() {
-  const [values, setValues] = useState(initial);
+export function ContactForm({ defaultWork = "" }: { defaultWork?: string }) {
+  const [values, setValues] = useState({ ...initial, work: defaultWork });
   const [consent, setConsent] = useState(false);
   const [website, setWebsite] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,7 +54,7 @@ export function ContactForm() {
     }
     const ok = await submit({ source: "contact", ...values, consent, website });
     if (ok) {
-      setValues(initial);
+      setValues({ ...initial, work: defaultWork });
       setConsent(false);
       setAttempted(false);
     }

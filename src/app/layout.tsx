@@ -4,7 +4,9 @@ import { ConsentManager } from "@/components/consent/consent-manager";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { Logo } from "@/components/layout/logo";
+import { MobileDock } from "@/components/layout/mobile-dock";
 import { site } from "@/config/site";
+import { services } from "@/content/services";
 import "./globals.css";
 
 const display = Outfit({
@@ -30,6 +32,19 @@ export const metadata: Metadata = {
   description:
     "Maîtrise RGE accompagne les particuliers dans leur rénovation énergétique : pompes à chaleur air/eau, isolation des combles et des murs, solaire et équipements thermodynamiques. Estimez vos aides en ligne.",
   applicationName: site.name,
+  keywords: [
+    "Maîtrise RGE",
+    "Maitrise RGE",
+    "rénovation énergétique",
+    "pompe à chaleur air eau",
+    "isolation des combles",
+    "isolation thermique par l'extérieur",
+    "système solaire combiné",
+    "ballon thermodynamique",
+    "panneaux photovoltaïques",
+    "MaPrimeRénov'",
+    "aides CEE",
+  ],
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
@@ -51,9 +66,18 @@ const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "HomeAndConstructionBusiness",
   name: site.name,
+  alternateName: ["Maitrise RGE", "Maîtrise RGE rénovation énergétique"],
   url: site.url,
   logo: `${site.url}/brand/symbol.png`,
   description: site.shortDescription,
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Prestations de rénovation énergétique",
+    itemListElement: services.map((s) => ({
+      "@type": "Offer",
+      itemOffered: { "@type": "Service", name: s.title, url: `${site.url}/prestations/${s.id}` },
+    })),
+  },
   ...(site.contact.phoneE164 && { telephone: site.contact.phoneE164 }),
   ...(site.contact.email && { email: site.contact.email }),
   ...(site.contact.serviceArea && { areaServed: site.contact.serviceArea }),
@@ -84,6 +108,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
+        <MobileDock />
         <ConsentManager />
         <script
           type="application/ld+json"

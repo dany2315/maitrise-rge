@@ -108,22 +108,28 @@ export function Services({ services }: { services: Service[] }) {
                       {s.goodToKnow}
                     </p>
 
-                    <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+                      <Link
+                        href={`/prestations/${s.id}`}
+                        className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-5 font-semibold text-white transition hover:bg-brand-900"
+                      >
+                        Découvrir la prestation
+                        <span className="sr-only"> : {s.title}</span>
+                        <ArrowIcon />
+                      </Link>
                       {s.simulatorWork ? (
                         <Link
                           href={`/simulateur?travaux=${s.simulatorWork}`}
-                          className="inline-flex min-h-11 items-center gap-2 font-semibold text-brand-800 underline-offset-4 hover:underline"
+                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 font-semibold text-brand-800 ring-1 ring-brand-200 ring-inset transition hover:bg-brand-50"
                         >
                           Estimer les aides pour ce projet
-                          <ArrowIcon />
                         </Link>
                       ) : (
                         <Link
                           href="/#contact"
-                          className="inline-flex min-h-11 items-center gap-2 font-semibold text-brand-800 underline-offset-4 hover:underline"
+                          className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-5 font-semibold text-brand-800 ring-1 ring-brand-200 ring-inset transition hover:bg-brand-50"
                         >
                           Parler de ce projet
-                          <ArrowIcon />
                         </Link>
                       )}
                     </div>

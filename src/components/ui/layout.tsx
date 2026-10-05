@@ -8,7 +8,7 @@ export function Container({ className, children }: { className?: string; childre
 /** Badge visible uniquement en mode revue pour signaler un contenu à valider. */
 export function ReviewBadge({ children = "À confirmer" }: { children?: ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-sun-100 px-2.5 py-1 text-xs font-semibold text-sun-800 ring-1 ring-sun-300">
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-sun-100 px-2.5 py-1 text-xs font-semibold whitespace-nowrap text-sun-800 ring-1 ring-sun-300">
       <span aria-hidden="true" className="size-1.5 rounded-full bg-sun-600" />
       {children}
     </span>

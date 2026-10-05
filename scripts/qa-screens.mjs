@@ -14,6 +14,9 @@ const base = process.argv[2] ?? "http://localhost:3000";
 const out = process.argv[3] ?? "qa-output";
 const routes = [
   "/",
+  "/prestations",
+  "/prestations/pompe-a-chaleur-air-eau",
+  "/prestations/panneaux-photovoltaiques",
   "/simulateur",
   "/conseils",
   "/conseils/pompe-a-chaleur-air-eau-maison",
@@ -78,7 +81,7 @@ for (const vp of viewports) {
       }
       for (const el of document.querySelectorAll("a, button, summary, label:has(input)")) {
         const r = el.getBoundingClientRect();
-        if (!el.offsetParent || r.width === 0) continue;
+        if (!el.offsetParent || r.width === 0 || el.closest(".sr-only") || el.classList.contains("sr-only")) continue;
         const text = (el.textContent || "").trim().slice(0, 40);
         const inline = el.tagName === "A" && el.closest("p, li") && !el.className.includes("min-h");
         if (!inline && (r.height < 40 || r.width < 40)) found.push(`Cible tactile ${Math.round(r.width)}×${Math.round(r.height)} : « ${text} »`);

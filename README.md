@@ -23,7 +23,7 @@ npm run dev
 
 ## Routes
 
-`/`, `/simulateur`, `/conseils`, `/conseils/[slug]`, `/mentions-legales`, `/confidentialite`,
+`/`, `/prestations`, `/prestations/[slug]` (6 pages), `/simulateur`, `/conseils`, `/conseils/[slug]`, `/mentions-legales`, `/confidentialite`,
 `/cookies`, ainsi que `/sitemap.xml`, `/robots.txt` et l'API `POST /api/leads`.
 
 ## Où modifier quoi
@@ -34,7 +34,10 @@ npm run dev
 | Qualifications, dispositifs, marques (affichés seulement si justifiés) | `src/config/trust.ts` |
 | Informations légales | `src/config/legal.ts` |
 | Traceurs soumis au consentement | `src/config/consent.ts` |
-| Prestations | `src/content/services.ts` |
+| Prestations (accueil, cartes) | `src/content/services.ts` |
+| Pages prestations détaillées | `src/content/service-pages.ts` |
+| Qui sommes-nous, engagements, note Google | `src/content/company.ts` |
+| Logos des marques | `public/brands/` (déclarés dans `src/config/trust.ts`) |
 | Accompagnement et FAQ | `src/content/home.ts` |
 | Articles Conseils | `src/content/articles.ts` |
 | Photos et crédits | `src/content/photos.ts` |
@@ -55,8 +58,16 @@ une validation du client. En production, ces éléments sont masqués ou neutral
   `status` à `"valide"`.
 - **Plafonds de revenus** : grille Anah 2025 marquée `verified: false` ; à contrôler sur
   [anah.gouv.fr](https://www.anah.gouv.fr/) puis passer `verified` à `true`.
-- **Qualifications et marques** (RGE, MaPrimeRénov', CEE, De Dietrich, Atlantic, Chappée) :
-  affichées uniquement avec `confirmed: true` et un justificatif dans `proof`.
+- **Bandeau des marques et labels** (Daikin, Atlantic, De Dietrich, Chappée, Airwell, RGE,
+  MaPrimeRénov', CEE) : affiché en production pour chaque élément passé à `confirmed: true`
+  avec un justificatif dans `proof`. Les logos des fabricants proviennent de leurs sites
+  officiels ; RGE, MaPrimeRénov' et CEE sont présentés en pastilles typographiques, leurs logos
+  officiels étant d'usage réglementé.
+- **Engagements** (`company.ts`) : seuls ceux marqués `confirmed: true` sont publiés.
+- **Note Google** (`company.ts`) : n'apparaît dans le hero qu'une fois la note et le nombre
+  d'avis réels de la fiche Google renseignés.
+- **« Un projet à la loupe »** : scénarios chiffrés calculés avec les barèmes du simulateur ;
+  affichés en production uniquement quand les barèmes sont validés (sinon, bandeau simulateur).
 - **Articles** : statut `a-valider` → non indexés (`noindex`) et absents du sitemap. Passer à
   `publie` après relecture des points listés dans `toCheck`.
 - **Pages légales** : chaque information manquante apparaît « À compléter ».
@@ -85,6 +96,7 @@ serveur** ; le visiteur ne voit le message de succès qu'après confirmation d'�
 - [ ] Coordonnées dans `site.ts` (le téléphone devient cliquable automatiquement)
 - [ ] Textes et informations légales dans `legal.ts`
 - [ ] Justificatifs des qualifications et marques dans `trust.ts`
+- [ ] Engagements à confirmer et note Google réelle dans `company.ts`
 - [ ] Barèmes, tarifs et remise validés dans `rules.ts`, grille de revenus vérifiée
 - [ ] Relecture et publication des articles
 - [ ] Variables d'environnement Google et `NEXT_PUBLIC_SITE_URL` sur Vercel

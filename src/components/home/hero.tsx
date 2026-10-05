@@ -5,8 +5,9 @@ import { Container } from "@/components/ui/layout";
 import { ctas } from "@/config/site";
 import { photos } from "@/content/photos";
 import { heatingOptions } from "@/lib/simulator/options";
+import { GoogleRating } from "./google-rating";
 
-export function Hero() {
+export function Hero({ reviewMode }: { reviewMode: boolean }) {
   return (
     <section aria-labelledby="hero-title" className="relative -mt-18 overflow-hidden pt-18 sm:-mt-20 sm:pt-20">
       {/* Fond : vague verte → bleue inspirée du logo */}
@@ -69,7 +70,11 @@ export function Hero() {
             </ButtonLink>
           </div>
 
-          <ul className="mt-10 grid animate-rise gap-x-8 gap-y-3 text-[0.95rem] text-ink-soft [animation-delay:320ms] sm:grid-cols-2">
+          <div className="mt-8 animate-rise [animation-delay:300ms]">
+            <GoogleRating reviewMode={reviewMode} />
+          </div>
+
+          <ul className="mt-8 grid animate-rise gap-x-8 gap-y-3 text-[0.95rem] text-ink-soft [animation-delay:320ms] sm:grid-cols-2">
             {[
               "Estimation indicative en 5 étapes",
               "Aides publiques et remise présentées séparément",

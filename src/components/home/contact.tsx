@@ -4,7 +4,15 @@ import { Container } from "@/components/ui/layout";
 import { site } from "@/config/site";
 import { photos } from "@/content/photos";
 
-export function Contact() {
+export function Contact({
+  defaultWork,
+  title = "Parlons de votre projet.",
+  intro = "Décrivez-nous votre logement et vos travaux. Nous revenons vers vous pour approfondir et préparer une visite si nécessaire.",
+}: {
+  defaultWork?: string;
+  title?: string;
+  intro?: string;
+}) {
   const { phoneDisplay, phoneE164, email, openingHours } = site.contact;
 
   return (
@@ -27,12 +35,9 @@ export function Contact() {
                 Contact &amp; devis
               </p>
               <h2 id="contact-title" className="mt-4 text-4xl font-semibold text-white sm:text-5xl">
-                Parlons de votre projet.
+                {title}
               </h2>
-              <p className="mt-5 max-w-sm text-lg text-brand-50/85">
-                Décrivez-nous votre logement et vos travaux. Nous revenons vers vous pour
-                approfondir et préparer une visite si nécessaire.
-              </p>
+              <p className="mt-5 max-w-sm text-lg text-brand-50/85">{intro}</p>
             </div>
 
             <dl className="grid gap-5 text-[0.98rem]">
@@ -67,7 +72,7 @@ export function Contact() {
           </div>
 
           <div className="p-6 sm:p-12 lg:col-span-7">
-            <ContactForm />
+            <ContactForm defaultWork={defaultWork} />
           </div>
         </div>
       </Container>

@@ -1,5 +1,5 @@
 import { photos, type Photo } from "./photos";
-import type { SimulatorWork } from "@/lib/simulator/options";
+import type { QuoteWork, SimulatorWork } from "@/lib/simulator/options";
 
 export type Service = {
   id: string;
@@ -12,12 +12,15 @@ export type Service = {
   photo: Photo;
   /** Travaux correspondants dans le simulateur, s'il y en a. */
   simulatorWork?: SimulatorWork;
+  /** Valeur pré-sélectionnée dans le formulaire de contact. */
+  quoteWork: QuoteWork;
   accent: "brand" | "sky" | "sun";
 };
 
 export const services: Service[] = [
   {
     id: "pompe-a-chaleur-air-eau",
+    quoteWork: "pac_air_eau",
     number: "01",
     title: "Pompe à chaleur air/eau",
     kicker: "Chauffage",
@@ -36,6 +39,7 @@ export const services: Service[] = [
   },
   {
     id: "isolation-des-combles",
+    quoteWork: "isolation_combles",
     number: "02",
     title: "Isolation des combles",
     kicker: "Isolation",
@@ -54,6 +58,7 @@ export const services: Service[] = [
   },
   {
     id: "isolation-thermique-exterieure",
+    quoteWork: "isolation_exterieure",
     number: "03",
     title: "Isolation thermique par l'extérieur",
     kicker: "Isolation",
@@ -72,6 +77,7 @@ export const services: Service[] = [
   },
   {
     id: "systeme-solaire-combine",
+    quoteWork: "ssc",
     number: "04",
     title: "Système solaire combiné",
     kicker: "Solaire thermique",
@@ -90,6 +96,7 @@ export const services: Service[] = [
   },
   {
     id: "equipements-thermodynamiques",
+    quoteWork: "ballon_thermo",
     number: "05",
     title: "Équipements thermodynamiques",
     kicker: "Eau chaude",
@@ -108,6 +115,7 @@ export const services: Service[] = [
   },
   {
     id: "panneaux-photovoltaiques",
+    quoteWork: "photovoltaique",
     number: "06",
     title: "Panneaux photovoltaïques",
     kicker: "Électricité solaire",
@@ -124,3 +132,5 @@ export const services: Service[] = [
     accent: "brand",
   },
 ];
+
+export const getService = (id: string) => services.find((s) => s.id === id);

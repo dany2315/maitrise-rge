@@ -17,6 +17,8 @@ export type TrustItem = {
   proof: string | null;
   /** Lien de vérification publique éventuel. */
   verifyUrl?: string;
+  /** Logo officiel de la marque (dossier public/brands), le cas échéant. */
+  logo?: { src: string; width: number; height: number };
 };
 
 export const trustItems: TrustItem[] = [
@@ -49,12 +51,22 @@ export const trustItems: TrustItem[] = [
     proof: null,
   },
   {
+    id: "daikin",
+    kind: "marque",
+    name: "Daikin",
+    description: "Marque de pompes à chaleur et de climatisation installée par nos équipes.",
+    confirmed: false,
+    proof: null,
+    logo: { src: "/brands/daikin.svg", width: 300, height: 65 },
+  },
+  {
     id: "de-dietrich",
     kind: "marque",
     name: "De Dietrich",
     description: "Marque d'équipements de chauffage installée par nos équipes.",
     confirmed: false,
     proof: null,
+    logo: { src: "/brands/de-dietrich.png", width: 571, height: 120 },
   },
   {
     id: "atlantic",
@@ -63,6 +75,7 @@ export const trustItems: TrustItem[] = [
     description: "Marque d'équipements de chauffage et d'eau chaude installée par nos équipes.",
     confirmed: false,
     proof: null,
+    logo: { src: "/brands/atlantic.svg", width: 210, height: 40 },
   },
   {
     id: "chappee",
@@ -71,6 +84,16 @@ export const trustItems: TrustItem[] = [
     description: "Marque d'équipements de chauffage installée par nos équipes.",
     confirmed: false,
     proof: null,
+    logo: { src: "/brands/chappee.svg", width: 167, height: 38 },
+  },
+  {
+    id: "airwell",
+    kind: "marque",
+    name: "Airwell",
+    description: "Marque de pompes à chaleur et de climatisation installée par nos équipes.",
+    confirmed: false,
+    proof: null,
+    logo: { src: "/brands/airwell.svg", width: 157, height: 38 },
   },
 ];
 
