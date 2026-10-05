@@ -29,6 +29,22 @@ export function GoogleRating({ reviewMode }: { reviewMode: boolean }) {
   const { rating, count, url } = googleReviews;
 
   if (rating === null || count === null) {
+    // Fiche connue mais note pas encore saisie : lien sobre vers les avis.
+    if (url) {
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener"
+          className="inline-flex min-h-11 items-center gap-2.5 rounded-full bg-white/80 py-1.5 pr-4 pl-3 text-sm font-semibold text-ink shadow-soft ring-1 ring-line transition hover:ring-brand-300"
+        >
+          <GoogleG />
+          Nos avis sur Google
+          <span aria-hidden="true" className="text-muted">→</span>
+          <span className="sr-only">(ouvre Google)</span>
+        </a>
+      );
+    }
     if (!reviewMode) return null;
     return (
       <p className="inline-flex flex-wrap items-center gap-2.5 rounded-full bg-white/70 py-1.5 pr-2 pl-3 text-sm text-muted border border-dashed border-line">
