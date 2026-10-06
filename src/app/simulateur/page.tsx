@@ -16,7 +16,7 @@ export default function SimulatorPage() {
   const mode = getSimulatorMode();
 
   return (
-    <div className="relative overflow-hidden pb-20 sm:pb-28">
+    <div className="relative isolate overflow-hidden pb-20 sm:pb-28">
       <div aria-hidden="true" className="absolute inset-x-0 top-0 -z-10 h-[34rem] bg-gradient-to-b from-brand-100/70 via-paper to-paper" />
       <div aria-hidden="true" className="absolute -top-24 right-[-8rem] -z-10 size-[30rem] rounded-full bg-sun-300/25 blur-3xl" />
 

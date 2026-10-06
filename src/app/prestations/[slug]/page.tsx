@@ -93,7 +93,7 @@ export default async function ServicePage({ params }: PageProps<"/prestations/[s
   return (
     <>
       {/* 1. Hero */}
-      <section aria-labelledby="service-title" className="relative overflow-hidden">
+      <section aria-labelledby="service-title" className="relative isolate overflow-hidden">
         <div aria-hidden="true" className="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 via-paper to-paper" />
         <Container className="pt-6 pb-16 sm:pt-8 lg:pb-24">
           <nav aria-label="Fil d'Ariane" className="text-sm text-muted">

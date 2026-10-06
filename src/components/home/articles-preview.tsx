@@ -32,7 +32,7 @@ export function ArticlesPreview({ articles }: { articles: Article[] }) {
         <div className="mt-12 grid gap-8 lg:grid-cols-12 lg:gap-10">
           <Link
             href={`/conseils/${featured.slug}`}
-            className="group relative flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-[2rem] p-7 sm:min-h-[30rem] sm:p-10 lg:col-span-7"
+            className="group relative isolate flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-[2rem] p-7 sm:min-h-[30rem] sm:p-10 lg:col-span-7"
           >
             <Image
               src={featured.photo.src}

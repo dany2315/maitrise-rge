@@ -149,16 +149,17 @@ export function Header({ logo }: { logo: ReactNode }) {
         hidden={!open}
         className="fixed inset-x-0 top-18 bottom-0 z-40 overflow-y-auto overscroll-contain bg-white sm:top-20 xl:hidden"
       >
-        <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 pt-6 pb-8 sm:px-6">
+        {/* Conçu pour tenir sur un seul écran de téléphone, boutons compris. */}
+        <div className="mx-auto flex min-h-full max-w-2xl flex-col px-4 pt-3 pb-[max(env(safe-area-inset-bottom),1rem)] sm:px-6 sm:pt-6 [@media(max-height:640px)]:pt-1 [@media(max-height:640px)]:pb-[max(env(safe-area-inset-bottom),0.75rem)]">
           <nav aria-label="Navigation mobile">
-            <ul className="divide-y divide-line border-y border-line">
+            <ul className="divide-y divide-line">
               {primaryNav.map((item, i) => (
                 <li key={item.href} style={{ animationDelay: `${i * 40}ms` }} className="animate-rise">
                   <Link
                     href={item.href}
                     onClick={() => setOpen(false)}
                     aria-current={isActive(item.href) ? "page" : undefined}
-                    className="flex min-h-16 items-center justify-between py-3 font-display text-2xl font-semibold text-ink aria-[current=page]:text-brand-700"
+                    className="flex min-h-[3.25rem] items-center justify-between py-1.5 font-display text-[1.35rem] [@media(max-height:640px)]:min-h-11 [@media(max-height:640px)]:text-[1.15rem] font-semibold text-ink aria-[current=page]:text-brand-700 sm:min-h-16 sm:text-2xl"
                   >
                     {item.label}
                     <ArrowIcon className="size-5 text-brand-500" />
@@ -168,34 +169,36 @@ export function Header({ logo }: { logo: ReactNode }) {
             </ul>
           </nav>
 
-          <div className="mt-7">
-            <p className="text-sm font-semibold tracking-[0.14em] text-muted uppercase">Nos prestations</p>
-            <ul className="mt-3 grid grid-cols-2 gap-2">
+          <div className="mt-4 border-t border-line pt-4 sm:mt-7 [@media(max-height:640px)]:mt-2 [@media(max-height:640px)]:pt-2.5">
+            <p className="text-xs font-semibold tracking-[0.14em] text-muted uppercase [@media(max-height:640px)]:sr-only">Nos prestations</p>
+            <ul className="mt-2.5 grid grid-cols-2 gap-1.5 sm:gap-2 [@media(max-height:640px)]:mt-0">
               {services.map((s) => (
                 <li key={s.id}>
                   <Link
                     href={`/prestations/${s.id}`}
                     onClick={() => setOpen(false)}
-                    className="flex min-h-14 items-center rounded-2xl bg-paper px-3.5 py-2.5 text-[0.95rem] leading-snug font-semibold text-ink ring-1 ring-line transition active:bg-brand-50"
+                    className="flex min-h-11 items-center gap-2 rounded-xl bg-paper px-3 text-[0.9rem] font-semibold whitespace-nowrap text-ink ring-1 ring-line transition active:bg-brand-50 sm:min-h-13 sm:text-[0.95rem]"
                   >
-                    {s.title}
+                    <span aria-hidden="true" className="size-1.5 shrink-0 rounded-full bg-brand-500" />
+                    <span className="truncate">{s.shortTitle}</span>
+                    <span className="sr-only"> : {s.title}</span>
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="mt-auto grid gap-3 pt-8">
-            <ButtonLink href={ctas.simulator.href} size="lg" onClick={() => setOpen(false)} icon={<ArrowIcon />}>
+          <div className="mt-auto grid grid-cols-2 gap-2 pt-4 [@media(max-height:640px)]:pt-2.5">
+            <ButtonLink href={ctas.simulator.href} onClick={() => setOpen(false)} className="min-h-12 px-2 text-[0.92rem] whitespace-nowrap">
               {ctas.simulator.label}
             </ButtonLink>
-            <ButtonLink href={ctas.quote.href} size="lg" variant="secondary" onClick={() => setOpen(false)}>
+            <ButtonLink href={ctas.quote.href} variant="secondary" onClick={() => setOpen(false)} className="min-h-12 px-2 text-[0.92rem] whitespace-nowrap">
               {ctas.quote.label}
             </ButtonLink>
             {phoneDisplay && phoneE164 && (
               <a
                 href={`tel:${phoneE164}`}
-                className="mt-1 inline-flex min-h-13 items-center justify-center gap-2 rounded-full bg-brand-50 px-6 text-base font-semibold text-brand-900"
+                className="col-span-2 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand-50 px-6 text-base font-semibold text-brand-900"
               >
                 <PhoneIcon />
                 Appeler le {phoneDisplay}

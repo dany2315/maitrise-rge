@@ -5,6 +5,8 @@ export type Service = {
   id: string;
   number: string;
   title: string;
+  /** Libellé court pour les menus. */
+  shortTitle: string;
   kicker: string;
   summary: string;
   points: string[];
@@ -20,6 +22,7 @@ export type Service = {
 export const services: Service[] = [
   {
     id: "pompe-a-chaleur-air-eau",
+    shortTitle: "Pompe à chaleur",
     quoteWork: "pac_air_eau",
     number: "01",
     title: "Pompe à chaleur air/eau",
@@ -39,6 +42,7 @@ export const services: Service[] = [
   },
   {
     id: "isolation-des-combles",
+    shortTitle: "Isolation combles",
     quoteWork: "isolation_combles",
     number: "02",
     title: "Isolation des combles",
@@ -58,6 +62,7 @@ export const services: Service[] = [
   },
   {
     id: "isolation-thermique-exterieure",
+    shortTitle: "Isolation extérieure",
     quoteWork: "isolation_exterieure",
     number: "03",
     title: "Isolation thermique par l'extérieur",
@@ -77,6 +82,7 @@ export const services: Service[] = [
   },
   {
     id: "systeme-solaire-combine",
+    shortTitle: "Solaire combiné",
     quoteWork: "ssc",
     number: "04",
     title: "Système solaire combiné",
@@ -96,6 +102,7 @@ export const services: Service[] = [
   },
   {
     id: "equipements-thermodynamiques",
+    shortTitle: "Ballon thermo.",
     quoteWork: "ballon_thermo",
     number: "05",
     title: "Équipements thermodynamiques",
@@ -115,6 +122,7 @@ export const services: Service[] = [
   },
   {
     id: "panneaux-photovoltaiques",
+    shortTitle: "Photovoltaïque",
     quoteWork: "photovoltaique",
     number: "06",
     title: "Panneaux photovoltaïques",

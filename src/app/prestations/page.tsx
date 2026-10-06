@@ -46,7 +46,7 @@ export default function PrestationsPage() {
             <li key={s.id} className={cn("min-h-[19rem] sm:min-h-[21rem] lg:min-h-0", spans[i])}>
               <Link
                 href={`/prestations/${s.id}`}
-                className="group relative flex h-full flex-col justify-end overflow-hidden rounded-[2rem] p-6 sm:p-8"
+                className="group relative isolate flex h-full flex-col justify-end overflow-hidden rounded-[2rem] p-6 sm:p-8"
               >
                 <Image
                   src={s.photo.src}
