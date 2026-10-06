@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <title>CEE – Certificats d'économies d'énergie</title>
+  <!-- Sceau festonné vert -->
+  <path fill="#7cc142" d="M60 2l7.2 6.4 9.3-2.7 4.5 8.6 9.6 1.1.9 9.6 8.4 4.8-2.9 9.2 6.2 7.4-6.2 7.4 2.9 9.2-8.4 4.8-.9 9.6-9.6 1.1-4.5 8.6-9.3-2.7L60 118l-7.2-6.4-9.3 2.7-4.5-8.6-9.6-1.1-.9-9.6-8.4-4.8 2.9-9.2L6.8 60 13 52.6l-2.9-9.2 8.4-4.8.9-9.6 9.6-1.1 4.5-8.6 9.3 2.7z"/>
+  <circle cx="60" cy="60" r="40" fill="#fff"/>
+  <circle cx="60" cy="60" r="35" fill="none" stroke="#2aa4dc" stroke-width="1.6" stroke-dasharray="1.6 3.2" stroke-linecap="round"/>
+  <text x="60" y="71" text-anchor="middle" font-family="Arial Rounded MT Bold, Arial, Helvetica, sans-serif" font-weight="700" font-size="30" fill="#2aa4dc" letter-spacing="1">CEE</text>
+</svg>

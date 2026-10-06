@@ -5,9 +5,8 @@ import { isPubliclyVisible, trustItems, type TrustItem } from "@/config/trust";
 
 /**
  * Bandeau défilant des marques d'équipements et des dispositifs.
- * Les marques s'affichent avec leur logo officiel ; les labels publics
- * (RGE, MaPrimeRénov', CEE) sous forme de pastilles typographiques, sans
- * reproduire leurs logos officiels dont l'usage est réglementé.
+ * Chaque élément s'affiche avec son logo officiel (dossier public/brands) ;
+ * à défaut de logo, une pastille typographique prend le relais.
  */
 const labelStyle: Record<string, { short: string; detail: string; tone: string; icon: ReactNode }> = {
   rge: {
@@ -38,8 +37,9 @@ function Item({ item }: { item: TrustItem }) {
         alt={item.name}
         width={item.logo.width}
         height={item.logo.height}
-        unoptimized
-        className="h-7 w-auto opacity-60 grayscale transition duration-300 group-hover/marquee:opacity-80 hover:!opacity-100 hover:!grayscale-0 sm:h-8"
+        unoptimized={item.logo.src.endsWith(".svg")}
+        sizes="200px"
+        className={`${item.logo.tall ? "h-12 sm:h-14" : "h-8 sm:h-9"} w-auto transition duration-300 hover:scale-105`}
       />
     );
   }
@@ -84,9 +84,9 @@ export function BrandsMarquee({ reviewMode }: { reviewMode: boolean }) {
           )}
         </div>
 
-        <div className="group/marquee relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]">
+        <div className="group/marquee relative min-w-0 flex-1 overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)] motion-reduce:[mask-image:none]">
           <div className="flex w-max animate-marquee items-center gap-12 group-hover/marquee:[animation-play-state:paused] motion-reduce:w-full motion-reduce:animate-none motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-8">
-            <ul className="flex shrink-0 items-center gap-12">
+            <ul className="flex shrink-0 items-center gap-12 motion-reduce:shrink motion-reduce:flex-wrap motion-reduce:justify-center motion-reduce:gap-x-10 motion-reduce:gap-y-6">
               {items.map((item) => (
                 <li key={item.id} className="flex shrink-0 items-center">
                   <Item item={item} />

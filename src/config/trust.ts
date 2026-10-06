@@ -18,7 +18,7 @@ export type TrustItem = {
   /** Lien de vérification publique éventuel. */
   verifyUrl?: string;
   /** Logo officiel de la marque (dossier public/brands), le cas échéant. */
-  logo?: { src: string; width: number; height: number };
+  logo?: { src: string; width: number; height: number; /** Affichage plus haut pour les logos compacts. */ tall?: boolean };
 };
 
 export const trustItems: TrustItem[] = [
@@ -30,6 +30,7 @@ export const trustItems: TrustItem[] = [
       "Qualification « Reconnu Garant de l'Environnement » pour les domaines de travaux couverts par le certificat en cours de validité.",
     confirmed: true,
     proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
+    logo: { src: "/brands/rge.png", width: 282, height: 68 },
     verifyUrl: "https://france-renov.gouv.fr/annuaires-professionnels/artisan-rge-architectes",
   },
   {
@@ -40,6 +41,7 @@ export const trustItems: TrustItem[] = [
       "Aide publique de l'Anah. Nous vous aidons à vérifier si votre projet peut en bénéficier ; l'attribution relève de l'Anah.",
     confirmed: true,
     proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
+    logo: { src: "/brands/maprimerenov.png", width: 855, height: 554, tall: true },
   },
   {
     id: "cee",
@@ -49,6 +51,7 @@ export const trustItems: TrustItem[] = [
       "Primes versées par des fournisseurs d'énergie. Les modalités dépendent du partenaire CEE retenu pour votre dossier.",
     confirmed: true,
     proof: "Affichage demandé par l'agence le 06/10/2026 — justificatif client à archiver",
+    logo: { src: "/brands/cee.svg", width: 120, height: 120, tall: true },
   },
   {
     id: "daikin",
