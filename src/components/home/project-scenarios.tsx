@@ -186,7 +186,10 @@ export function ProjectScenarios({ rules, isExample }: { rules: SimulatorRules; 
             </div>
 
             <div className="mx-auto mt-8 flex max-w-xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <p className="font-semibold text-ink">Et pour votre maison ?</p>
+              <p className="font-semibold text-ink">
+                Et pour votre maison ?
+                <span className="block text-sm font-medium text-muted">Et les dossiers d&apos;aides ? Nous nous en chargeons.</span>
+              </p>
               <ButtonLink href={`/simulateur?travaux=${scenario.answers.work}`} icon={<ArrowIcon />}>
                 Estimer mes aides
               </ButtonLink>

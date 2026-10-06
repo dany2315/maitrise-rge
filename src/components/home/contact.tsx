@@ -3,6 +3,7 @@ import { ContactForm } from "@/components/forms/contact-form";
 import { Container } from "@/components/ui/layout";
 import { site } from "@/config/site";
 import { photos } from "@/content/photos";
+import { PromiseIcon } from "./promise-icon";
 
 export function Contact({
   defaultWork,
@@ -41,11 +42,15 @@ export function Contact({
             </div>
 
             <dl className="grid gap-5 text-[0.98rem]">
-              <div>
-                <dt className="text-sm font-semibold tracking-wide text-brand-200 uppercase">Ce qui suit</dt>
-                <dd className="mt-1.5 text-brand-50/90">
-                  Un échange pour préciser vos besoins, puis une visite technique et un devis détaillé.
-                </dd>
+              {/* Atout « un seul interlocuteur » */}
+              <div className="grid grid-cols-[3rem_1fr] items-center gap-x-4 rounded-2xl bg-white/10 p-4 ring-1 ring-white/15 backdrop-blur-sm">
+                <dt className="contents">
+                  <span className="row-span-2 flex size-12 items-center justify-center rounded-full bg-sun-400 text-brand-950">
+                    <PromiseIcon name="contact" className="size-6" />
+                  </span>
+                  <span className="font-display text-lg font-semibold text-white">Un conseiller dédié</span>
+                </dt>
+                <dd className="text-brand-50/85">La même personne vous suit du premier appel à la mise en service.</dd>
               </div>
               {phoneDisplay && phoneE164 && (
                 <div>

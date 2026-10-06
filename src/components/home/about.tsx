@@ -3,6 +3,7 @@ import { Container } from "@/components/ui/layout";
 import { Reveal } from "@/components/ui/reveal";
 import { about } from "@/content/company";
 import { photos } from "@/content/photos";
+import { PromiseIcon } from "./promise-icon";
 
 const accents = ["from-brand-400 to-brand-600", "from-sky-500 to-sky-600", "from-sun-300 to-sun-400"];
 
@@ -72,6 +73,16 @@ export function About() {
             />
             <div aria-hidden="true" className="absolute inset-0 bg-gradient-to-t from-brand-950/80 via-brand-950/25 to-transparent sm:bg-gradient-to-r sm:from-brand-950/85 sm:via-brand-950/40" />
           </div>
+          {/* Atout « artisans RGE » */}
+          <p className="absolute top-5 right-5 left-5 flex items-center gap-3 rounded-2xl bg-white/95 p-3 pr-4 shadow-lift backdrop-blur sm:top-8 sm:right-8 sm:left-auto sm:max-w-xs">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-brand-700 text-white">
+              <PromiseIcon name="rge" className="size-6" />
+            </span>
+            <span className="text-[0.95rem] leading-snug">
+              <span className="block font-semibold text-ink">Des artisans qualifiés RGE</span>
+              <span className="text-ink-soft">sur chacun de nos chantiers</span>
+            </span>
+          </p>
           <figure className="absolute inset-x-0 bottom-0 p-7 sm:inset-y-0 sm:right-auto sm:flex sm:max-w-xl sm:flex-col sm:justify-center sm:p-12">
             <blockquote className="font-display text-3xl leading-tight font-semibold text-white sm:text-4xl">
               « Votre confort au service d&apos;un avenir <span className="text-brand-300">plus vert</span>. »

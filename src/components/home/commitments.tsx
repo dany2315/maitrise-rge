@@ -1,6 +1,7 @@
 import { Container, ReviewBadge } from "@/components/ui/layout";
 import { Reveal } from "@/components/ui/reveal";
 import { commitments } from "@/content/company";
+import { cn } from "@/lib/cn";
 
 const icons = [
   <path key="0" d="M4 7h16M4 12h16M4 17h10" />,
@@ -36,7 +37,12 @@ export function Commitments({ reviewMode }: { reviewMode: boolean }) {
           </p>
         </div>
 
-        <ol className="mt-14 grid gap-px overflow-hidden rounded-[2rem] bg-white/10 ring-1 ring-white/10 sm:grid-cols-2 lg:grid-cols-3">
+        <ol
+          className={cn(
+            "mt-14 grid gap-px overflow-hidden rounded-[2rem] bg-white/10 ring-1 ring-white/10 sm:grid-cols-2",
+            list.length % 2 === 0 && list.length % 3 !== 0 ? "lg:grid-cols-2" : "lg:grid-cols-3",
+          )}
+        >
           {list.map((c, i) => (
             <Reveal as="li" key={c.title} delay={(i % 3) * 90} className="group relative bg-ink p-7 transition-colors duration-300 hover:bg-[#182a37] sm:p-9">
               <div className="flex items-start justify-between gap-4">

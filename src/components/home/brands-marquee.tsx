@@ -75,7 +75,7 @@ export function BrandsMarquee({ reviewMode }: { reviewMode: boolean }) {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:gap-10 lg:px-8 lg:py-7">
         <div className="flex shrink-0 items-center justify-between gap-3 lg:block lg:w-52">
           <h2 id="marques-title" className="font-display text-sm leading-snug font-semibold tracking-[0.12em] text-muted uppercase">
-            Équipements de grandes marques <span className="text-brand-700">&amp; aides</span>
+            Les grandes marques du chauffage, <span className="text-brand-700">posées chez vous</span>
           </h2>
           {reviewMode && pending && (
             <span className="lg:mt-2 lg:block">

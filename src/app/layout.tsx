@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     template: "%s | Maîtrise RGE",
   },
   description:
-    "Maîtrise RGE accompagne les particuliers dans leur rénovation énergétique : pompes à chaleur air/eau, isolation des combles et des murs, solaire et équipements thermodynamiques. Estimez vos aides en ligne.",
+    "Maîtrise RGE accompagne les particuliers dans leur rénovation énergétique : pré-visite gratuite, artisans RGE certifiés, démarches MaPrimeRénov' et CEE gérées de A à Z. Pompes à chaleur, isolation, solaire. Estimez vos aides en ligne.",
   applicationName: site.name,
   keywords: [
     "Maîtrise RGE",

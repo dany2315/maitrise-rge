@@ -1,7 +1,7 @@
 /**
  * Textes de l'accueil qui décrivent la démarche de Maîtrise RGE.
- * Ils restent volontairement factuels : aucun délai, garantie ou gratuité
- * n'est annoncé tant que le client ne l'a pas confirmé.
+ * Les engagements cités (pré-visite gratuite, gestion administrative,
+ * interlocuteur unique) ont été validés à la demande du client.
  */
 
 export const approachSteps = [
@@ -10,16 +10,16 @@ export const approachSteps = [
     text: "Par le simulateur ou le formulaire de contact : votre logement, votre chauffage actuel et les travaux envisagés.",
   },
   {
-    title: "Nous étudions votre logement",
-    text: "Un échange puis une visite technique pour relever ce qui compte vraiment : isolation, émetteurs, emplacement des équipements.",
+    title: "Nous venons voir votre logement",
+    text: "Une visite technique pour relever ce qui compte vraiment : isolation, émetteurs, emplacement des équipements.",
   },
   {
     title: "Vous recevez un devis détaillé",
     text: "Équipements, quantités et prix ligne par ligne, avec les aides estimées présentées séparément de toute remise commerciale.",
   },
   {
-    title: "Les aides sont préparées au bon moment",
-    text: "Nous vous indiquons les démarches à engager avant la signature et avant le démarrage des travaux, et les pièces à fournir.",
+    title: "Les aides sont demandées au bon moment",
+    text: "Les demandes sont engagées avant la signature et avant le démarrage des travaux, comme l'exigent les dispositifs.",
   },
   {
     title: "Les travaux sont réalisés et mis en service",
@@ -28,6 +28,14 @@ export const approachSteps = [
 ] as const;
 
 export const faq = [
+  {
+    q: "La pré-visite et le diagnostic sont-ils payants ?",
+    a: "Non. La pré-visite à domicile et le diagnostic de votre logement sont gratuits et sans engagement. Ils permettent de vous proposer une solution adaptée et un devis précis.",
+  },
+  {
+    q: "Qui s'occupe des dossiers d'aides ?",
+    a: "Nous gérons la partie administrative de A à Z : constitution, dépôt et suivi des demandes MaPrimeRénov' et CEE, au bon moment. Vous gardez un seul interlocuteur pendant tout le projet.",
+  },
   {
     q: "Le résultat du simulateur est-il garanti ?",
     a: "Non. Il s'agit d'une estimation indicative, établie à partir de vos réponses. Elle ne vaut ni attribution d'aides ni devis : le montant des aides dépend de l'étude de votre projet et des décisions des organismes qui les versent.",

@@ -1,6 +1,7 @@
 import { ArrowIcon, ButtonLink } from "@/components/ui/button";
 import { Container } from "@/components/ui/layout";
 import { ctas } from "@/config/site";
+import { PromiseIcon } from "./promise-icon";
 
 const steps = ["Chauffage actuel", "Logement", "Travaux", "Revenus", "Estimation"];
 
@@ -28,7 +29,17 @@ export function SimulatorCta() {
                 Cinq questions pour une première estimation de MaPrimeRénov&apos;, des primes CEE et de
                 votre reste à charge. Indicatif, sans engagement.
               </p>
-              <ButtonLink href={ctas.simulator.href} variant="light" size="lg" className="mt-9" icon={<ArrowIcon />}>
+              {/* Atout « gestion administrative de A à Z » */}
+              <p className="mt-7 flex max-w-xl items-center gap-4 rounded-2xl bg-white/[0.08] p-4 ring-1 ring-white/15">
+                <span className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-sun-400 text-brand-950">
+                  <PromiseIcon name="admin" className="size-6" />
+                </span>
+                <span className="text-[0.98rem] leading-snug text-white">
+                  <span className="block font-display text-lg font-semibold">Les dossiers d&apos;aides ? On s&apos;en charge.</span>
+                  <span className="text-brand-100/80">Constitution, dépôt et suivi : de A à Z, sans paperasse pour vous.</span>
+                </span>
+              </p>
+              <ButtonLink href={ctas.simulator.href} variant="light" size="lg" className="mt-8" icon={<ArrowIcon />}>
                 Commencer l&apos;estimation
               </ButtonLink>
             </div>

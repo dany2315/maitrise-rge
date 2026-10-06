@@ -5,6 +5,7 @@ import { BrandsMarquee } from "@/components/home/brands-marquee";
 import { Commitments } from "@/components/home/commitments";
 import { Contact } from "@/components/home/contact";
 import { Faq } from "@/components/home/faq";
+import { FreeVisit } from "@/components/home/free-visit";
 import { Hero } from "@/components/home/hero";
 import { ProjectScenarios } from "@/components/home/project-scenarios";
 import { Services } from "@/components/home/services";
@@ -23,6 +24,7 @@ export default function HomePage() {
       <Hero reviewMode={reviewMode} />
       <BrandsMarquee reviewMode={reviewMode} />
       <Services services={services} />
+      <FreeVisit />
       <About />
       <Approach />
       <Commitments reviewMode={reviewMode} />

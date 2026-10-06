@@ -30,7 +30,7 @@ export function Footer() {
               <span className="text-brand-300">plus vert</span>.
             </p>
             <p className="mt-4 text-brand-100/75">
-              Une première estimation en quelques minutes, puis une étude de votre logement.
+              Une première estimation en quelques minutes, puis une pré-visite gratuite de votre logement.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
